@@ -1,0 +1,67 @@
+ 7. Write a C program to perform breadth-first search (BFS) on a graph represented as an
+adjacency list.
+Solution:
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+typedef struct Node {
+ int vertex;
+ struct Node *next;
+} Node;
+Node* createNode(int v) {
+ Node newNode = (Node)malloc(sizeof(Node));
+ newNode->vertex = v;
+ newNode->next = NULL;
+ return newNode;
+}
+typedef struct Graph {
+ Node *adjList[MAX];
+} Graph;
+ void initGraph(Graph *graph, int vertices) {
+ for (int i = 0; i < vertices; i++) {
+ graph->adjList[i] = NULL;
+ }
+}
+void addEdge(Graph *graph, int src, int dest) {
+ Node *newNode = createNode(dest);
+ newNode->next = graph->adjList[src];
+ graph->adjList[src] = newNode;
+ newNode = createNode(src);
+ newNode->next = graph->adjList[dest];
+ graph->adjList[dest] = newNode;
+}
+void BFS(Graph *graph, int startVertex, int vertices) {
+ int visited[MAX] = {0};
+ Node *queue[MAX];
+ int front = 0, rear = -1;
+ visited[startVertex] = 1;
+ queue[++rear] = graph->adjList[startVertex];
+ printf("BFS traversal: ");
+ while (front <= rear) {
+ Node *currentNode = queue[front++];
+ printf("%d ", currentNode->vertex);
+ while (currentNode != NULL) {
+ int adjVertex = currentNode->vertex;
+ if (!visited[adjVertex]) {
+ visited[adjVertex] = 1;
+ queue[++rear] = graph->adjList[adjVertex];
+ }
+ currentNode = currentNode->next;
+ }
+ }
+ printf("\n");
+}
+int main() {
+ int vertices, edges, i, src, dest;
+ printf("Enter number of vertices and edges: ");
+ scanf("%d %d", &vertices, &edges);
+ Graph graph;
+ initGraph(&graph, vertices);
+ printf("Enter edges (source destination):\n");
+ for (i = 0; i < edges; i++) {
+ scanf("%d %d", &src, &dest);
+ addEdge(&graph, src, dest);
+ }
+ BFS(&graph, 0, vertices);
+ return 0;
+}
